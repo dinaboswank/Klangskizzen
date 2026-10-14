@@ -100,7 +100,7 @@ body {
   display: grid;
 
   grid-template-columns: 1fr 40px;
-  grid-template-rows: 1fr;
+  grid-template-rows: 1fr auto;
 
   box-sizing: border-box;
 
@@ -133,6 +133,67 @@ body {
   padding: 8px 0;
 
   box-sizing: border-box;
+}
+
+
+/* Titel-Taste unter den Zeichen */
+
+#titleButton {
+  display: none;
+
+  grid-column: 1 / span 2;
+  grid-row: 2;
+
+  min-width: 0;
+  height: 40px;
+
+  margin: 0;
+  padding: 0 8px;
+
+  border: 0;
+  border-top: var(--line) solid var(--ink);
+  border-radius: 0;
+
+  background: transparent;
+
+  color: var(--ink);
+
+  font: 700 13px/1 "Atkinson Hyperlegible", "Trebuchet MS", sans-serif;
+
+  cursor: pointer;
+
+  -webkit-tap-highlight-color: transparent;
+}
+
+
+/* Titel-Taste in der Werkzeugleiste (Desktop), rechts bei Speichern */
+
+#controls #titleButtonBar {
+  flex: 0 1 auto;
+
+  min-width: 72px;
+  max-width: 200px;
+
+  padding: 0 16px !important;
+
+  font: 700 14px/1 "Atkinson Hyperlegible", "Trebuchet MS", sans-serif;
+}
+
+
+.titleButtonText {
+  display: block;
+
+  overflow: hidden;
+
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+
+#titleButton:active,
+#controls #titleButtonBar:active {
+  background: var(--ink);
+  color: var(--paper);
 }
 
 
@@ -285,10 +346,13 @@ body {
 
 /* =====================================================
    TITEL DES STÜCKS
-   Anzeige klein oben rechts, Eingabe über das T-Werkzeug
+   Steht nur in der Titel-Taste unter den Zeichen.
+   (Auf dem gespeicherten Bild steht er weiterhin oben rechts.)
    ===================================================== */
 
 #titleDisplay {
+  display: none;
+
   position: absolute;
 
   top: 8px;
@@ -523,6 +587,36 @@ body {
 
 #landscape .step {
   mix-blend-mode: multiply;
+}
+
+
+/* Welle: Ringe breiten sich vom klingenden Zeichen aus */
+
+.wave {
+  position: absolute;
+
+  width: var(--wave-size, 60px);
+  height: var(--wave-size, 60px);
+
+  box-sizing: border-box;
+
+  border: 2px solid var(--wave-color, var(--ink));
+  border-radius: 50%;
+
+  transform: translate(-50%, -50%) scale(.5);
+
+  opacity: 0;
+
+  pointer-events: none;
+
+  z-index: 5;
+
+  animation: wave 1s ease-out forwards;
+}
+
+@keyframes wave {
+  0%   { transform: translate(-50%, -50%) scale(.5); opacity: .85; }
+  100% { transform: translate(-50%, -50%) scale(2.6); opacity: 0; }
 }
 
 
@@ -936,7 +1030,7 @@ body {
 
   #soundpalette {
     grid-template-columns: 1fr 32px;
-    grid-template-rows: 1fr;
+    grid-template-rows: 1fr auto;
   }
 
   #pitchColumn {
@@ -1016,7 +1110,7 @@ body {
   }
 
 
-  /* ---------- Linke Seite: drei runde Kästen ---------- */
+  /* ---------- Linke Seite: ein runder Kasten, drei Spalten ---------- */
 
   #soundpalette {
     bottom: var(--gap);
@@ -1024,13 +1118,16 @@ body {
     display: grid;
 
     grid-template-columns: var(--slider-col) var(--slider-col) 1fr;
-    grid-template-rows: 1fr;
+    grid-template-rows: 1fr auto;
 
-    gap: 6px;
+    gap: 0;
 
-    border: 0;
+    border: var(--line) solid var(--ink);
+    border-radius: var(--radius);
 
-    background: transparent;
+    background: var(--paper);
+
+    overflow: hidden;
   }
 
 
@@ -1048,10 +1145,7 @@ body {
 
     box-sizing: border-box;
 
-    border: var(--line) solid var(--ink);
-    border-radius: var(--radius);
-
-    background: var(--paper);
+    border-right: var(--line) solid var(--ink);
 
     min-height: 0;
   }
@@ -1059,13 +1153,25 @@ body {
 
   #tempoColumn {
     grid-column: 1;
-    grid-row: 1;
+    grid-row: 1 / span 2;
   }
 
 
   #pitchColumn {
     grid-column: 2;
-    grid-row: 1;
+    grid-row: 1 / span 2;
+  }
+
+
+  #titleButton {
+    display: block;
+
+    grid-column: 3;
+    grid-row: 2;
+
+    height: 32px;
+
+    font-size: 12px;
   }
 
 
@@ -1081,24 +1187,18 @@ body {
     justify-items: center;
 
     padding: 4px;
-
-    border: var(--line) solid var(--ink);
-    border-radius: var(--radius);
-
-    background: var(--paper);
   }
 
 
   .pitchLabel,
   .sideLabel {
-    font-size: 9px;
+    font-size: 10px;
+    font-weight: 400;
     line-height: 1;
   }
 
 
   .sideValue {
-    font-size: 11px;
-    font-weight: 700;
     font-variant-numeric: tabular-nums;
   }
 
@@ -1225,6 +1325,12 @@ body {
     height: 23px;
   }
 
+  /* Titel sitzt links unter den Zeichen */
+
+  #controls #titleButtonBar {
+    display: none !important;
+  }
+
   /* Tempo sitzt links als Schieber */
 
   #tempoGroup {
@@ -1321,6 +1427,10 @@ body {
 
     <div id="paletteIcons"></div>
 
+    <button class="titleButton" id="titleButton" type="button" title="Titel" aria-label="Titel">
+      <span class="titleButtonText">Titel</span>
+    </button>
+
     <div id="pitchColumn">
 
       <span class="pitchLabel">hoch</span>
@@ -1373,10 +1483,17 @@ body {
       </svg>
     </button>
 
-    <button class="controlButton" id="undo" title="Rückgängig" aria-label="Rückgängig">
+    <button class="controlButton" id="undo" title="Schritt zurück" aria-label="Schritt zurück">
       <svg class="icon" viewBox="0 0 24 24" aria-hidden="true">
         <path d="M9 4L5 8l4 4"></path>
         <path d="M5 8h10a5 5 0 0 1 0 10H9"></path>
+      </svg>
+    </button>
+
+    <button class="controlButton" id="redo" title="Wiederherstellen" aria-label="Wiederherstellen">
+      <svg class="icon" viewBox="0 0 24 24" aria-hidden="true">
+        <path d="M15 4l4 4-4 4"></path>
+        <path d="M19 8H9a5 5 0 0 0 0 10h6"></path>
       </svg>
     </button>
 
@@ -1396,13 +1513,6 @@ body {
       </svg>
     </div>
 
-    <button class="controlButton" id="titleButton" title="Titel des Stücks" aria-label="Titel des Stücks">
-      <svg class="icon" viewBox="0 0 24 24" aria-hidden="true">
-        <path d="M5 6h14"></path>
-        <path d="M12 6v13"></path>
-      </svg>
-    </button>
-
     <div id="tempoGroup">
 
       <span class="tempoLabel">langsam</span>
@@ -1414,6 +1524,10 @@ body {
       <span id="tempoValue">90 BPM</span>
 
     </div>
+
+    <button class="controlButton titleButton" id="titleButtonBar" type="button" title="Titel" aria-label="Titel">
+      <span class="titleButtonText">Titel</span>
+    </button>
 
     <button class="controlButton" id="saveImage" title="Partitur als Bild speichern" aria-label="Bild speichern">
       <svg class="icon" viewBox="0 0 24 24" aria-hidden="true">
@@ -1664,6 +1778,7 @@ const stopButton = document.getElementById("stop");
 const drawButton = document.getElementById("drawPath");
 const resetButton = document.getElementById("resetScore");
 const undoButton = document.getElementById("undo");
+const redoButton = document.getElementById("redo");
 const saveImageButton = document.getElementById("saveImage");
 const openImageButton = document.getElementById("openImage");
 const imageInput = document.getElementById("imageInput");
@@ -1673,7 +1788,7 @@ const tempoGroup = document.getElementById("tempoGroup");
 const fullscreenButton = document.getElementById("fullscreen");
 const tempoSliderV = document.getElementById("tempoSliderV");
 const tempoNumber = document.getElementById("tempoNumber");
-const titleButton = document.getElementById("titleButton");
+const titleButtons = document.querySelectorAll(".titleButton");
 const titleDialog = document.getElementById("titleDialog");
 const titleOk = document.getElementById("titleOk");
 const titleDisplay = document.getElementById("titleDisplay");
@@ -3241,6 +3356,42 @@ function flashCell(cell) {
   void cell.offsetWidth;   // Animation neu starten
   cell.classList.add("hit");
 
+  makeWave(cell);
+
+}
+
+
+/* Drei Ringe in der Farbe des Zeichens, leicht versetzt */
+
+function makeWave(cell) {
+
+  const size = Math.max(cell.offsetWidth, cell.offsetHeight) *
+    Number(cell.dataset.scale || 1);
+
+  const color = colorFromPitch(Number(
+    cell.dataset.pitch === undefined ? 50 : cell.dataset.pitch
+  ));
+
+  for (let i = 0; i < 3; i++) {
+
+    const ring = document.createElement("div");
+
+    ring.className = "wave";
+
+    ring.style.left = cell.style.left;
+    ring.style.top = cell.style.top;
+    ring.style.animationDelay = (i * 0.15) + "s";
+    ring.style.setProperty("--wave-size", size + "px");
+    ring.style.setProperty("--wave-color", color);
+
+    ring.addEventListener("animationend", function () {
+      ring.remove();
+    });
+
+    landscape.appendChild(ring);
+
+  }
+
 }
 
 
@@ -3576,9 +3727,10 @@ if (stopButton) {
    (Zeichen + Linie, nicht das Tempo).
    ========================================================= */
 
-const HISTORY_MAX = 40;
+const HISTORY_MAX = 10;
 
 let history = [];
+let future = [];
 let pendingState = null;
 
 
@@ -3651,12 +3803,20 @@ function updateUndoButton() {
   if (undoButton) {
     undoButton.disabled = history.length === 0;
   }
+  if (redoButton) {
+    redoButton.disabled = future.length === 0;
+  }
 }
 
 
 function pushHistory(state) {
 
+  /* neue Änderung: Wiederherstellen ist nicht mehr möglich */
+
+  future = [];
+
   if (history.length && history[history.length - 1] === state) {
+    updateUndoButton();
     return;
   }
 
@@ -3696,13 +3856,9 @@ function endChange() {
 }
 
 
-function undo() {
+/* falls gerade der Stift aktiv ist: abbrechen */
 
-  if (!history.length) {
-    return;
-  }
-
-  /* falls gerade der Stift aktiv ist: abbrechen */
+function stopDrawingMode() {
 
   if (drawingMode) {
     drawingMode = false;
@@ -3712,7 +3868,45 @@ function undo() {
     drawButton.classList.remove("active");
   }
 
+}
+
+
+function undo() {
+
+  if (!history.length) {
+    return;
+  }
+
+  stopDrawingMode();
+
+  future.push(getState());
+
+  if (future.length > HISTORY_MAX) {
+    future.shift();
+  }
+
   applyState(history.pop());
+
+  updateUndoButton();
+
+}
+
+
+function redo() {
+
+  if (!future.length) {
+    return;
+  }
+
+  stopDrawingMode();
+
+  history.push(getState());
+
+  if (history.length > HISTORY_MAX) {
+    history.shift();
+  }
+
+  applyState(future.pop());
 
   updateUndoButton();
 
@@ -3721,6 +3915,10 @@ function undo() {
 
 if (undoButton) {
   undoButton.addEventListener("click", undo);
+}
+
+if (redoButton) {
+  redoButton.addEventListener("click", redo);
 }
 
 updateUndoButton();
@@ -5224,14 +5422,21 @@ updateTempoVertical();
 
 
 /* =========================================================
-   TITEL – über das T in der Werkzeugleiste eingeben,
-   steht dann klein oben rechts auf der Partitur
+   TITEL – über die Titel-Taste eingeben (Handy quer:
+   unter den Zeichen, Desktop: rechts bei Speichern),
+   steht dann in der Taste selbst
    ========================================================= */
 
 function updateTitleDisplay() {
 
   if (titleDisplay && scoreTitle) {
     titleDisplay.textContent = scoreTitle.value.trim();
+  }
+
+  if (scoreTitle) {
+    document.querySelectorAll(".titleButtonText").forEach(function (text) {
+      text.textContent = scoreTitle.value.trim() || "Titel";
+    });
   }
 
 }
@@ -5268,9 +5473,9 @@ function closeTitleDialog() {
 }
 
 
-if (titleButton) {
-  titleButton.addEventListener("click", openTitleDialog);
-}
+titleButtons.forEach(function (button) {
+  button.addEventListener("click", openTitleDialog);
+});
 
 if (titleOk) {
   titleOk.addEventListener("click", closeTitleDialog);
