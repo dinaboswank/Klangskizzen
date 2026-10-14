@@ -329,10 +329,13 @@ body {
 
 /* =====================================================
    TITEL DES STÜCKS
-   Anzeige klein oben rechts, Eingabe über das T-Werkzeug
+   Steht nur in der Titel-Taste unter den Zeichen.
+   (Auf dem gespeicherten Bild steht er weiterhin oben rechts.)
    ===================================================== */
 
 #titleDisplay {
+  display: none;
+
   position: absolute;
 
   top: 8px;
@@ -1170,14 +1173,13 @@ body {
 
   .pitchLabel,
   .sideLabel {
-    font-size: 9px;
+    font-size: 10px;
+    font-weight: 400;
     line-height: 1;
   }
 
 
   .sideValue {
-    font-size: 11px;
-    font-weight: 700;
     font-variant-numeric: tabular-nums;
   }
 
@@ -1400,7 +1402,7 @@ body {
 
     <div id="paletteIcons"></div>
 
-    <button id="titleButton" type="button" title="Titel des Stücks" aria-label="Titel des Stücks">
+    <button id="titleButton" type="button" title="Titel" aria-label="Titel">
       <span id="titleButtonText">Titel</span>
     </button>
 
@@ -5393,7 +5395,7 @@ updateTempoVertical();
 
 /* =========================================================
    TITEL – über die Taste unter den Zeichen eingeben,
-   steht dann klein oben rechts auf der Partitur
+   steht dann in der Taste selbst
    ========================================================= */
 
 function updateTitleDisplay() {
