@@ -139,6 +139,8 @@ body {
 /* Titel-Taste unter den Zeichen */
 
 #titleButton {
+  display: none;
+
   grid-column: 1 / span 2;
   grid-row: 2;
 
@@ -164,7 +166,21 @@ body {
 }
 
 
-#titleButtonText {
+/* Titel-Taste in der Werkzeugleiste (Desktop), rechts bei Speichern */
+
+#controls #titleButtonBar {
+  flex: 0 1 auto;
+
+  min-width: 72px;
+  max-width: 200px;
+
+  padding: 0 16px !important;
+
+  font: 700 14px/1 "Atkinson Hyperlegible", "Trebuchet MS", sans-serif;
+}
+
+
+.titleButtonText {
   display: block;
 
   overflow: hidden;
@@ -174,7 +190,8 @@ body {
 }
 
 
-#titleButton:active {
+#titleButton:active,
+#controls #titleButtonBar:active {
   background: var(--ink);
   color: var(--paper);
 }
@@ -1147,6 +1164,8 @@ body {
 
 
   #titleButton {
+    display: block;
+
     grid-column: 3;
     grid-row: 2;
 
@@ -1306,6 +1325,12 @@ body {
     height: 23px;
   }
 
+  /* Titel sitzt links unter den Zeichen */
+
+  #controls #titleButtonBar {
+    display: none !important;
+  }
+
   /* Tempo sitzt links als Schieber */
 
   #tempoGroup {
@@ -1402,8 +1427,8 @@ body {
 
     <div id="paletteIcons"></div>
 
-    <button id="titleButton" type="button" title="Titel" aria-label="Titel">
-      <span id="titleButtonText">Titel</span>
+    <button class="titleButton" id="titleButton" type="button" title="Titel" aria-label="Titel">
+      <span class="titleButtonText">Titel</span>
     </button>
 
     <div id="pitchColumn">
@@ -1499,6 +1524,10 @@ body {
       <span id="tempoValue">90 BPM</span>
 
     </div>
+
+    <button class="controlButton titleButton" id="titleButtonBar" type="button" title="Titel" aria-label="Titel">
+      <span class="titleButtonText">Titel</span>
+    </button>
 
     <button class="controlButton" id="saveImage" title="Partitur als Bild speichern" aria-label="Bild speichern">
       <svg class="icon" viewBox="0 0 24 24" aria-hidden="true">
@@ -1759,8 +1788,7 @@ const tempoGroup = document.getElementById("tempoGroup");
 const fullscreenButton = document.getElementById("fullscreen");
 const tempoSliderV = document.getElementById("tempoSliderV");
 const tempoNumber = document.getElementById("tempoNumber");
-const titleButton = document.getElementById("titleButton");
-const titleButtonText = document.getElementById("titleButtonText");
+const titleButtons = document.querySelectorAll(".titleButton");
 const titleDialog = document.getElementById("titleDialog");
 const titleOk = document.getElementById("titleOk");
 const titleDisplay = document.getElementById("titleDisplay");
@@ -5394,7 +5422,8 @@ updateTempoVertical();
 
 
 /* =========================================================
-   TITEL – über die Taste unter den Zeichen eingeben,
+   TITEL – über die Titel-Taste eingeben (Handy quer:
+   unter den Zeichen, Desktop: rechts bei Speichern),
    steht dann in der Taste selbst
    ========================================================= */
 
@@ -5404,8 +5433,10 @@ function updateTitleDisplay() {
     titleDisplay.textContent = scoreTitle.value.trim();
   }
 
-  if (titleButtonText && scoreTitle) {
-    titleButtonText.textContent = scoreTitle.value.trim() || "Titel";
+  if (scoreTitle) {
+    document.querySelectorAll(".titleButtonText").forEach(function (text) {
+      text.textContent = scoreTitle.value.trim() || "Titel";
+    });
   }
 
 }
@@ -5442,9 +5473,9 @@ function closeTitleDialog() {
 }
 
 
-if (titleButton) {
-  titleButton.addEventListener("click", openTitleDialog);
-}
+titleButtons.forEach(function (button) {
+  button.addEventListener("click", openTitleDialog);
+});
 
 if (titleOk) {
   titleOk.addEventListener("click", closeTitleDialog);
