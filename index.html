@@ -100,7 +100,7 @@ body {
   display: grid;
 
   grid-template-columns: 1fr 40px;
-  grid-template-rows: 1fr;
+  grid-template-rows: 1fr auto;
 
   box-sizing: border-box;
 
@@ -133,6 +133,50 @@ body {
   padding: 8px 0;
 
   box-sizing: border-box;
+}
+
+
+/* Titel-Taste unter den Zeichen */
+
+#titleButton {
+  grid-column: 1 / span 2;
+  grid-row: 2;
+
+  min-width: 0;
+  height: 40px;
+
+  margin: 0;
+  padding: 0 8px;
+
+  border: 0;
+  border-top: var(--line) solid var(--ink);
+  border-radius: 0;
+
+  background: transparent;
+
+  color: var(--ink);
+
+  font: 700 13px/1 "Atkinson Hyperlegible", "Trebuchet MS", sans-serif;
+
+  cursor: pointer;
+
+  -webkit-tap-highlight-color: transparent;
+}
+
+
+#titleButtonText {
+  display: block;
+
+  overflow: hidden;
+
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+
+#titleButton:active {
+  background: var(--ink);
+  color: var(--paper);
 }
 
 
@@ -523,6 +567,36 @@ body {
 
 #landscape .step {
   mix-blend-mode: multiply;
+}
+
+
+/* Welle: Ringe breiten sich vom klingenden Zeichen aus */
+
+.wave {
+  position: absolute;
+
+  width: var(--wave-size, 60px);
+  height: var(--wave-size, 60px);
+
+  box-sizing: border-box;
+
+  border: 2px solid var(--wave-color, var(--ink));
+  border-radius: 50%;
+
+  transform: translate(-50%, -50%) scale(.5);
+
+  opacity: 0;
+
+  pointer-events: none;
+
+  z-index: 5;
+
+  animation: wave 1s ease-out forwards;
+}
+
+@keyframes wave {
+  0%   { transform: translate(-50%, -50%) scale(.5); opacity: .85; }
+  100% { transform: translate(-50%, -50%) scale(2.6); opacity: 0; }
 }
 
 
@@ -936,7 +1010,7 @@ body {
 
   #soundpalette {
     grid-template-columns: 1fr 32px;
-    grid-template-rows: 1fr;
+    grid-template-rows: 1fr auto;
   }
 
   #pitchColumn {
@@ -1016,7 +1090,7 @@ body {
   }
 
 
-  /* ---------- Linke Seite: drei runde Kästen ---------- */
+  /* ---------- Linke Seite: ein runder Kasten, drei Spalten ---------- */
 
   #soundpalette {
     bottom: var(--gap);
@@ -1024,13 +1098,16 @@ body {
     display: grid;
 
     grid-template-columns: var(--slider-col) var(--slider-col) 1fr;
-    grid-template-rows: 1fr;
+    grid-template-rows: 1fr auto;
 
-    gap: 6px;
+    gap: 0;
 
-    border: 0;
+    border: var(--line) solid var(--ink);
+    border-radius: var(--radius);
 
-    background: transparent;
+    background: var(--paper);
+
+    overflow: hidden;
   }
 
 
@@ -1048,10 +1125,7 @@ body {
 
     box-sizing: border-box;
 
-    border: var(--line) solid var(--ink);
-    border-radius: var(--radius);
-
-    background: var(--paper);
+    border-right: var(--line) solid var(--ink);
 
     min-height: 0;
   }
@@ -1059,13 +1133,23 @@ body {
 
   #tempoColumn {
     grid-column: 1;
-    grid-row: 1;
+    grid-row: 1 / span 2;
   }
 
 
   #pitchColumn {
     grid-column: 2;
-    grid-row: 1;
+    grid-row: 1 / span 2;
+  }
+
+
+  #titleButton {
+    grid-column: 3;
+    grid-row: 2;
+
+    height: 32px;
+
+    font-size: 12px;
   }
 
 
@@ -1081,11 +1165,6 @@ body {
     justify-items: center;
 
     padding: 4px;
-
-    border: var(--line) solid var(--ink);
-    border-radius: var(--radius);
-
-    background: var(--paper);
   }
 
 
@@ -1321,6 +1400,10 @@ body {
 
     <div id="paletteIcons"></div>
 
+    <button id="titleButton" type="button" title="Titel des Stücks" aria-label="Titel des Stücks">
+      <span id="titleButtonText">Titel</span>
+    </button>
+
     <div id="pitchColumn">
 
       <span class="pitchLabel">hoch</span>
@@ -1380,6 +1463,13 @@ body {
       </svg>
     </button>
 
+    <button class="controlButton" id="redo" title="Wiederherstellen" aria-label="Wiederherstellen">
+      <svg class="icon" viewBox="0 0 24 24" aria-hidden="true">
+        <path d="M15 4l4 4-4 4"></path>
+        <path d="M19 8H9a5 5 0 0 0 0 10h6"></path>
+      </svg>
+    </button>
+
     <button class="controlButton" id="resetScore" title="Alles löschen" aria-label="Alles löschen">
       <svg class="icon" viewBox="0 0 24 24" aria-hidden="true">
         <path d="M6 6l12 12"></path>
@@ -1395,13 +1485,6 @@ body {
         <path d="M10 11v6M14 11v6"></path>
       </svg>
     </div>
-
-    <button class="controlButton" id="redo" title="Wiederherstellen" aria-label="Wiederherstellen">
-      <svg class="icon" viewBox="0 0 24 24" aria-hidden="true">
-        <path d="M15 4l4 4-4 4"></path>
-        <path d="M19 8H9a5 5 0 0 0 0 10h6"></path>
-      </svg>
-    </button>
 
     <div id="tempoGroup">
 
@@ -1675,6 +1758,7 @@ const fullscreenButton = document.getElementById("fullscreen");
 const tempoSliderV = document.getElementById("tempoSliderV");
 const tempoNumber = document.getElementById("tempoNumber");
 const titleButton = document.getElementById("titleButton");
+const titleButtonText = document.getElementById("titleButtonText");
 const titleDialog = document.getElementById("titleDialog");
 const titleOk = document.getElementById("titleOk");
 const titleDisplay = document.getElementById("titleDisplay");
@@ -3241,6 +3325,42 @@ function flashCell(cell) {
   cell.classList.remove("hit");
   void cell.offsetWidth;   // Animation neu starten
   cell.classList.add("hit");
+
+  makeWave(cell);
+
+}
+
+
+/* Drei Ringe in der Farbe des Zeichens, leicht versetzt */
+
+function makeWave(cell) {
+
+  const size = Math.max(cell.offsetWidth, cell.offsetHeight) *
+    Number(cell.dataset.scale || 1);
+
+  const color = colorFromPitch(Number(
+    cell.dataset.pitch === undefined ? 50 : cell.dataset.pitch
+  ));
+
+  for (let i = 0; i < 3; i++) {
+
+    const ring = document.createElement("div");
+
+    ring.className = "wave";
+
+    ring.style.left = cell.style.left;
+    ring.style.top = cell.style.top;
+    ring.style.animationDelay = (i * 0.15) + "s";
+    ring.style.setProperty("--wave-size", size + "px");
+    ring.style.setProperty("--wave-color", color);
+
+    ring.addEventListener("animationend", function () {
+      ring.remove();
+    });
+
+    landscape.appendChild(ring);
+
+  }
 
 }
 
@@ -5272,15 +5392,18 @@ updateTempoVertical();
 
 
 /* =========================================================
-   TITEL – steht klein oben rechts auf der Partitur.
-   Die Titel-Taste ist entfernt; ein Titel kommt nur
-   noch über geladene Partitur-Bilder herein.
+   TITEL – über die Taste unter den Zeichen eingeben,
+   steht dann klein oben rechts auf der Partitur
    ========================================================= */
 
 function updateTitleDisplay() {
 
   if (titleDisplay && scoreTitle) {
     titleDisplay.textContent = scoreTitle.value.trim();
+  }
+
+  if (titleButtonText && scoreTitle) {
+    titleButtonText.textContent = scoreTitle.value.trim() || "Titel";
   }
 
 }
