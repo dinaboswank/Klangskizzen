@@ -1373,7 +1373,7 @@ body {
       </svg>
     </button>
 
-    <button class="controlButton" id="undo" title="Rückgängig" aria-label="Rückgängig">
+    <button class="controlButton" id="undo" title="Schritt zurück" aria-label="Schritt zurück">
       <svg class="icon" viewBox="0 0 24 24" aria-hidden="true">
         <path d="M9 4L5 8l4 4"></path>
         <path d="M5 8h10a5 5 0 0 1 0 10H9"></path>
@@ -1396,10 +1396,10 @@ body {
       </svg>
     </div>
 
-    <button class="controlButton" id="titleButton" title="Titel des Stücks" aria-label="Titel des Stücks">
+    <button class="controlButton" id="redo" title="Wiederherstellen" aria-label="Wiederherstellen">
       <svg class="icon" viewBox="0 0 24 24" aria-hidden="true">
-        <path d="M5 6h14"></path>
-        <path d="M12 6v13"></path>
+        <path d="M15 4l4 4-4 4"></path>
+        <path d="M19 8H9a5 5 0 0 0 0 10h6"></path>
       </svg>
     </button>
 
@@ -1664,6 +1664,7 @@ const stopButton = document.getElementById("stop");
 const drawButton = document.getElementById("drawPath");
 const resetButton = document.getElementById("resetScore");
 const undoButton = document.getElementById("undo");
+const redoButton = document.getElementById("redo");
 const saveImageButton = document.getElementById("saveImage");
 const openImageButton = document.getElementById("openImage");
 const imageInput = document.getElementById("imageInput");
@@ -3576,9 +3577,10 @@ if (stopButton) {
    (Zeichen + Linie, nicht das Tempo).
    ========================================================= */
 
-const HISTORY_MAX = 40;
+const HISTORY_MAX = 10;
 
 let history = [];
+let future = [];
 let pendingState = null;
 
 
@@ -3651,12 +3653,20 @@ function updateUndoButton() {
   if (undoButton) {
     undoButton.disabled = history.length === 0;
   }
+  if (redoButton) {
+    redoButton.disabled = future.length === 0;
+  }
 }
 
 
 function pushHistory(state) {
 
+  /* neue Änderung: Wiederherstellen ist nicht mehr möglich */
+
+  future = [];
+
   if (history.length && history[history.length - 1] === state) {
+    updateUndoButton();
     return;
   }
 
@@ -3696,13 +3706,9 @@ function endChange() {
 }
 
 
-function undo() {
+/* falls gerade der Stift aktiv ist: abbrechen */
 
-  if (!history.length) {
-    return;
-  }
-
-  /* falls gerade der Stift aktiv ist: abbrechen */
+function stopDrawingMode() {
 
   if (drawingMode) {
     drawingMode = false;
@@ -3712,7 +3718,45 @@ function undo() {
     drawButton.classList.remove("active");
   }
 
+}
+
+
+function undo() {
+
+  if (!history.length) {
+    return;
+  }
+
+  stopDrawingMode();
+
+  future.push(getState());
+
+  if (future.length > HISTORY_MAX) {
+    future.shift();
+  }
+
   applyState(history.pop());
+
+  updateUndoButton();
+
+}
+
+
+function redo() {
+
+  if (!future.length) {
+    return;
+  }
+
+  stopDrawingMode();
+
+  history.push(getState());
+
+  if (history.length > HISTORY_MAX) {
+    history.shift();
+  }
+
+  applyState(future.pop());
 
   updateUndoButton();
 
@@ -3721,6 +3765,10 @@ function undo() {
 
 if (undoButton) {
   undoButton.addEventListener("click", undo);
+}
+
+if (redoButton) {
+  redoButton.addEventListener("click", redo);
 }
 
 updateUndoButton();
@@ -5224,8 +5272,9 @@ updateTempoVertical();
 
 
 /* =========================================================
-   TITEL – über das T in der Werkzeugleiste eingeben,
-   steht dann klein oben rechts auf der Partitur
+   TITEL – steht klein oben rechts auf der Partitur.
+   Die Titel-Taste ist entfernt; ein Titel kommt nur
+   noch über geladene Partitur-Bilder herein.
    ========================================================= */
 
 function updateTitleDisplay() {

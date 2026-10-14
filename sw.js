@@ -6,7 +6,7 @@
    Nur dann holen sich die Geräte die neue Version.
    ========================================================= */
 
-const VERSION_NUMMER = "v3";
+const VERSION_NUMMER = "v4";
 
 
 /* Jedes Repository bekommt seinen eigenen Speicher –
